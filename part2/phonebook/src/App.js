@@ -5,7 +5,7 @@ import People from './components/People'
 import Filter from './components/Filter'
 
 const App = () => {
-    const [persons, setPersons] = useState([]);
+    const [ persons, setPersons] = useState([]);
     const [ newName, setNewName ] = useState(''); //form input name
     const [ newNumber, setNewNumber ] = useState(''); // form input number
     const [ newFilter, setNewFilter ] = useState('') // filter
