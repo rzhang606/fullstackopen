@@ -1,15 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 import FormField from './components/FormField'
 import People from './components/People'
 import Filter from './components/Filter'
 
 const App = () => {
-    const [persons, setPersons] = useState([
-        { name: 'Arto Hellas', number: '040-123456' },
-        { name: 'Ada Lovelace', number: '39-44-5323523' },
-        { name: 'Dan Abramov', number: '12-43-234345' },
-        { name: 'Mary Poppendieck', number: '39-23-6423122' }
-    ]);
+    const [persons, setPersons] = useState([]);
     const [ newName, setNewName ] = useState(''); //form input name
     const [ newNumber, setNewNumber ] = useState(''); // form input number
     const [ newFilter, setNewFilter ] = useState('') // filter
@@ -45,6 +41,18 @@ const App = () => {
         console.log(event.target.value);
         setNewFilter(event.target.value);
     }
+
+    //effects
+
+    useEffect(() => {
+        console.log('Fetching data ... ');
+        axios
+            .get('http://localhost:3001/persons')
+            .then(response => {
+                console.log('Promise fulfilled');
+                setPersons(response.data);
+            })
+    }, []) // empty array tells it to only run initially
 
     return (
         <div>
