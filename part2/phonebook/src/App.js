@@ -3,12 +3,16 @@ import FormField from './components/FormField'
 import People from './components/People'
 import Filter from './components/Filter'
 import personService from './services/Persons'
+import Notification from './components/Notification'
+import Error from './components/Error'
 
 const App = () => {
     const [ persons, setPersons] = useState([]);
     const [ newName, setNewName ] = useState(''); // form input name
     const [ newNumber, setNewNumber ] = useState(''); // form input number
-    const [ newFilter, setNewFilter ] = useState('') // filter
+    const [ newFilter, setNewFilter ] = useState(''); // filter
+    const [ notif, setNotif ] = useState(null); //notification
+    const [ error, setError ] = useState(null); // error
 
     //event handlers
     const handleNameChange = (event) => {
@@ -38,17 +42,21 @@ const App = () => {
                     console.log('Updating new number');
                     personService.update(duplicate[0].id, personObj).then( result => {
                         refreshAll();
-                    })
+                        createNotif(`${newName}'s number has been updated`);
+                    }).catch(err => {
+                        createError(`${newName} could not be updated, likely removed from server aleady.`)
+                    });
                 }
             }
         } else {    // add new record
-            personService
-                .create(personObj)
-                .then(result => {
-                    setPersons(persons.concat(result));
-                    setNewName('');
-                    setNewNumber('');
-                });
+            personService.create(personObj).then(result => {
+                setPersons(persons.concat(result));
+                setNewName('');
+                setNewNumber('');
+                createNotif(`${personObj.name} has been added`);
+            }).catch(err => {
+                createError(`${personObj.name} could not be added, server issue`);
+            });
         }
     }
 
@@ -90,9 +98,21 @@ const App = () => {
         setNewNumber('');
     }
 
+    const createNotif = (message) => {
+        setNotif(message);
+        setTimeout(() => {setNotif(null)}, 5000) // 2 seconds
+    }
+
+    const createError = (message) => {
+        setError(message);
+        setTimeout(() => {setError(null)}, 5000);
+    }
+
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification message={notif}/>
+            <Error message={error} />
             <Filter input={newFilter} inputHandler={handleFilterChange}/>
             <h2>Add New:</h2>
             <form onSubmit={handleSubmit}>
