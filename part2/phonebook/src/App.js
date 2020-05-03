@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import FormField from './components/FormField'
 import People from './components/People'
 import Filter from './components/Filter'
+import personService from './services/Persons'
 
 const App = () => {
     const [ persons, setPersons] = useState([]);
-    const [ newName, setNewName ] = useState(''); //form input name
+    const [ newName, setNewName ] = useState(''); // form input name
     const [ newNumber, setNewNumber ] = useState(''); // form input number
     const [ newFilter, setNewFilter ] = useState('') // filter
 
@@ -28,12 +28,37 @@ const App = () => {
             name: newName,
             number: newNumber
         };
-        if(persons.filter(person => person.name === newName).length !== 0) {
-            window.alert(`${newName} is already added to phonebook.`)
-        } else {
-            setPersons(persons.concat(personObj));
-            setNewName('');
-            setNewNumber('');
+        const duplicate = persons.filter(person => person.name === newName);
+        if(duplicate.length !== 0) { //if record exists
+            if(duplicate[0].number === newNumber) { //duplicate
+                window.alert(`${newName} is already added to phonebook.`);
+            } else { //update number
+                const confirmation = window.confirm(`Update ${newName}'s number with ${newNumber}?`);
+                if(confirmation) {
+                    console.log('Updating new number');
+                    personService.update(duplicate[0].id, personObj).then( result => {
+                        refreshAll();
+                    })
+                }
+            }
+        } else {    // add new record
+            personService
+                .create(personObj)
+                .then(result => {
+                    setPersons(persons.concat(result));
+                    setNewName('');
+                    setNewNumber('');
+                });
+        }
+    }
+
+    const handleDelete = (id) => {
+        const result = window.confirm(`Delete ${persons[id-1].name}'s record?`);
+        if(result) {
+            console.log('Delete: ', id);
+            personService.remove(id).then(request => {
+                refresh();
+            });
         }
     }
 
@@ -43,16 +68,27 @@ const App = () => {
     }
 
     //effects
-
     useEffect(() => {
         console.log('Fetching data ... ');
-        axios
-            .get('http://localhost:3001/persons')
-            .then(response => {
-                console.log('Promise fulfilled');
-                setPersons(response.data);
+        personService
+            .getAll()
+            .then(numbers => {
+                setPersons(numbers);
             })
     }, []) // empty array tells it to only run initially
+
+    //helpers
+    const refresh = () => {
+        personService.getAll().then(result => {
+            setPersons(result);
+        });
+    }
+
+    const refreshAll = () => {
+        refresh();
+        setNewName('');
+        setNewNumber('');
+    }
 
     return (
         <div>
@@ -67,7 +103,7 @@ const App = () => {
                 </div>
             </form>
             <h2>Numbers</h2>
-            <People persons={persons} filter={newFilter} />
+            <People persons={persons} filter={newFilter} deleteHandler={handleDelete} />
         </div>
     )
 }
