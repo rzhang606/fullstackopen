@@ -61,7 +61,7 @@ const App = () => {
     }
 
     const handleDelete = (id) => {
-        const result = window.confirm(`Delete ${persons[id-1].name}'s record?`);
+        const result = window.confirm(`Delete ${(persons.find(element => element.id === id)).name}'s record?`);
         if(result) {
             console.log('Delete: ', id);
             personService.remove(id).then(request => {
