@@ -8,8 +8,8 @@ import Error from './components/Error'
 
 const App = () => {
     const [ persons, setPersons] = useState([]);
-    const [ newName, setNewName ] = useState(''); // form input name
-    const [ newNumber, setNewNumber ] = useState(''); // form input number
+    const [ newName, setNewName ] = useState(null); // form input name
+    const [ newNumber, setNewNumber ] = useState(null); // form input number
     const [ newFilter, setNewFilter ] = useState(''); // filter
     const [ notif, setNotif ] = useState(null); //notification
     const [ error, setError ] = useState(null); // error
@@ -44,18 +44,17 @@ const App = () => {
                         refreshAll();
                         createNotif(`${newName}'s number has been updated`);
                     }).catch(err => {
-                        createError(`${newName} could not be updated, likely removed from server aleady.`)
+                        createError(`${newName} could not be updated: ${err}`)
                     });
                 }
             }
         } else {    // add new record
             personService.create(personObj).then(result => {
                 setPersons(persons.concat(result));
-                setNewName('');
-                setNewNumber('');
+                resetField();
                 createNotif(`${personObj.name} has been added`);
             }).catch(err => {
-                createError(`${personObj.name} could not be added, server issue`);
+                createError(`${personObj.name} could not be added: ${err}`);
             });
         }
     }
@@ -94,8 +93,15 @@ const App = () => {
 
     const refreshAll = () => {
         refresh();
+        resetField();
+    }
+
+    //fields must be reset to empty string before null or it will persist text
+    const resetField = () => {
         setNewName('');
+        setNewName(null);
         setNewNumber('');
+        setNewNumber(null);
     }
 
     const createNotif = (message) => {

@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseURL = 'http://localhost:3001/api/persons';
+const baseURL = '/api/persons'; //proxy redirects (from package.json)
 
 const getAll = () => {
     console.log('Getting all from server ... ');
