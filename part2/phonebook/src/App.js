@@ -44,7 +44,7 @@ const App = () => {
                         refreshAll();
                         createNotif(`${newName}'s number has been updated`);
                     }).catch(err => {
-                        createError(`${newName} could not be updated: ${err}`)
+                        createError(`${newName} could not be updated: ${err.response.data}`)
                     });
                 }
             }
@@ -54,7 +54,7 @@ const App = () => {
                 resetField();
                 createNotif(`${personObj.name} has been added`);
             }).catch(err => {
-                createError(`${personObj.name} could not be added: ${err}`);
+                createError(`${personObj.name} could not be added: ${err.response.data}`);
             });
         }
     }
