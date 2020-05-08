@@ -94,6 +94,10 @@ const App = () => {
                 username, password,
             })
 
+            //save token to local storage
+            window.localStorage.setItem(
+                'loggedPersonUser', JSON.stringify(user)
+            );
             personService.setToken(user.token);
             setUser(user);
             resetLogin();
@@ -107,6 +111,7 @@ const App = () => {
     /**
      * Effects
      */
+    //initial fetching of persons
     useEffect(() => {
         console.log('Fetching data ... ');
         personService
@@ -115,6 +120,15 @@ const App = () => {
                 setPersons(numbers);
             })
     }, []) // empty array tells it to only run initially
+
+    useEffect(() => {
+        const loggedUserJSON = window.localStorage.getItem('loggedPersonUser');
+        if (loggedUserJSON) {
+            const user = JSON.parse(loggedUserJSON);
+            setUser(user);
+            personService.setToken(user.token)
+        }
+    }, [])
 
     /**
      * Helpers
