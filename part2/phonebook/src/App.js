@@ -63,15 +63,17 @@ const App = () => {
                 resetField();
                 createNotif(`${personObj.name} has been added`);
             }).catch(err => {
+                console.log(err);
                 createError(`${personObj.name} could not be added: ${err.response.data}`);
             });
         }
     }
 
     const handleDelete = (id) => {
-        const result = window.confirm(`Delete ${(persons.find(element => element.id === id)).name}'s record?`);
+        const delName = (persons.find(element => element.id === id)).name;
+        const result = window.confirm(`Delete ${delName}'s record?`);
         if(result) {
-            console.log('Delete: ', id);
+            console.log('Delete: ', id, delName);
             personService.remove(id).then(request => {
                 refresh();
             });
@@ -92,6 +94,7 @@ const App = () => {
                 username, password,
             })
 
+            personService.setToken(user.token);
             setUser(user);
             resetLogin();
         } catch (ex) {
