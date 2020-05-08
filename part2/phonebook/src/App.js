@@ -2,19 +2,28 @@ import React, { useState, useEffect } from 'react'
 import FormField from './components/FormField'
 import People from './components/People'
 import Filter from './components/Filter'
-import personService from './services/Persons'
 import Notification from './components/Notification'
 import Error from './components/Error'
+
+import personService from './services/Persons'
+import loginService from './services/Login'
 
 const App = () => {
     const [ persons, setPersons] = useState([]);
     const [ newName, setNewName ] = useState(null); // form input name
     const [ newNumber, setNewNumber ] = useState(null); // form input number
     const [ newFilter, setNewFilter ] = useState(''); // filter
-    const [ notif, setNotif ] = useState(null); //notification
-    const [ error, setError ] = useState(null); // error
 
-    //event handlers
+    const [ username, setUsername ] = useState(''); // form input username
+    const [ password, setPassword ] = useState('');
+    const [ user, setUser ] = useState(null);
+
+    const [ notif, setNotif ] = useState(null); // notification message
+    const [ error, setError ] = useState(null); // error message
+
+    /**
+     * Event Handlers
+     */
     const handleNameChange = (event) => {
         console.log(event.target.value);
         setNewName(event.target.value);
@@ -74,7 +83,27 @@ const App = () => {
         setNewFilter(event.target.value);
     }
 
-    //effects
+    //uses username and password to login, then saves the retrieved token and user details to 'user' field
+    const handleLogin = async (event) => {
+        event.preventDefault();
+        console.log('Logging in for', username, password);
+        try{
+            const user = await loginService.login({
+                username, password,
+            })
+
+            setUser(user);
+            resetLogin();
+        } catch (ex) {
+            createError('Wrong credentials');
+        }
+
+        
+    } 
+
+    /**
+     * Effects
+     */
     useEffect(() => {
         console.log('Fetching data ... ');
         personService
@@ -84,7 +113,9 @@ const App = () => {
             })
     }, []) // empty array tells it to only run initially
 
-    //helpers
+    /**
+     * Helpers
+     */
     const refresh = () => {
         personService.getAll().then(result => {
             setPersons(result);
@@ -94,6 +125,7 @@ const App = () => {
     const refreshAll = () => {
         refresh();
         resetField();
+        resetLogin();
     }
 
     //fields must be reset to empty string before null or it will persist text
@@ -102,6 +134,11 @@ const App = () => {
         setNewName(null);
         setNewNumber('');
         setNewNumber(null);
+    }
+
+    const resetLogin = () => {
+        setUsername('');
+        setPassword('');
     }
 
     const createNotif = (message) => {
@@ -114,13 +151,21 @@ const App = () => {
         setTimeout(() => {setError(null)}, 5000);
     }
 
-    return (
+    const loginForm = () => (
+        <form onSubmit={handleLogin}>
+            <div>
+                username <input type='text' value={username} name='Username' onChange={({ target }) => setUsername(target.value)} />
+            </div>
+            <div>
+                password <input type='text' value={password} name='Password' onChange={({ target }) => setPassword(target.value)} />
+            </div>
+            <button type='submit'>Login</button>
+        </form>
+    )
+
+    const noteForm = () => (
         <div>
-            <h2>Phonebook</h2>
-            <Notification message={notif}/>
-            <Error message={error} />
-            <Filter input={newFilter} inputHandler={handleFilterChange}/>
-            <h2>Add New:</h2>
+            <h2>Add New as {user.name}:</h2>
             <form onSubmit={handleSubmit}>
                 <FormField title="Name" input={newName} inputHandler={handleNameChange} />
                 <FormField title="Number" input={newNumber} inputHandler={handleNumberChange} />
@@ -128,6 +173,16 @@ const App = () => {
                 <button type="submit">add</button>
                 </div>
             </form>
+            <Filter input={newFilter} inputHandler={handleFilterChange}/>
+        </div>
+    )
+
+    return (
+        <div>
+            <h2>Phonebook</h2>
+            <Notification message={notif}/>
+            <Error message={error} />
+            {user === null ? loginForm() : noteForm()}
             <h2>Numbers</h2>
             <People persons={persons} filter={newFilter} deleteHandler={handleDelete} />
         </div>
