@@ -11,12 +11,8 @@ import loginService from './services/Login'
 
 const App = () => {
     const [ persons, setPersons] = useState([]);
-    const [ newName, setNewName ] = useState(null); // form input name
-    const [ newNumber, setNewNumber ] = useState(null); // form input number
     const [ newFilter, setNewFilter ] = useState(''); // filter
 
-    const [ username, setUsername ] = useState(''); // form input username
-    const [ password, setPassword ] = useState('');
     const [ user, setUser ] = useState(null);
 
     const [ notif, setNotif ] = useState(null); // notification message
@@ -25,47 +21,33 @@ const App = () => {
     /**
      * Event Handlers
      */
-    const handleNameChange = (event) => {
-        console.log(event.target.value);
-        setNewName(event.target.value);
-    }
 
-    const handleNumberChange = (event) => {
-        console.log(event.target.value);
-        setNewNumber(event.target.value);
-    }
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        //check if newName exists already
-        const personObj = {
-            name: newName,
-            number: newNumber
-        };
-        const duplicate = persons.filter(person => person.name === newName);
+    const publishPerson = (nPerson) => {
+        
+        const duplicate = persons.filter(person => person.name === nPerson.name);
         if(duplicate.length !== 0) { //if record exists
-            if(duplicate[0].number === newNumber) { //duplicate
-                window.alert(`${newName} is already added to phonebook.`);
+            if(duplicate[0].number === nPerson.number) { //duplicate
+                window.alert(`${nPerson.name} is already added to phonebook.`);
             } else { //update number
-                const confirmation = window.confirm(`Update ${newName}'s number with ${newNumber}?`);
+                const confirmation = window.confirm(`Update ${nPerson.name}'s number with ${nPerson.number}?`);
                 if(confirmation) {
                     console.log('Updating new number');
-                    personService.update(duplicate[0].id, personObj).then( result => {
-                        refreshAll();
-                        createNotif(`${newName}'s number has been updated`);
+                    personService.update(duplicate[0].id, nPerson).then( result => {
+                        createNotif(`${nPerson.name}'s number has been updated`);
+                        refresh();
                     }).catch(err => {
-                        createError(`${newName} could not be updated: ${err.response.data}`)
+                        createError(`${nPerson.name} could not be updated: ${err.response.data}`)
                     });
                 }
             }
         } else {    // add new record
-            personService.create(personObj).then(result => {
+            personService.create(nPerson).then(result => {
                 setPersons(persons.concat(result));
-                resetField();
-                createNotif(`${personObj.name} has been added`);
+                createNotif(`${nPerson.name} has been added`);
+                refresh();
             }).catch(err => {
                 console.log(err);
-                createError(`${personObj.name} could not be added: ${err.response.data}`);
+                createError(`${nPerson.name} could not be added: ${err.response.data}`);
             });
         }
     }
@@ -82,18 +64,14 @@ const App = () => {
     }
 
     const handleFilterChange = (event) => {
-        console.log(event.target.value);
         setNewFilter(event.target.value);
     }
 
     //uses username and password to login, then saves the retrieved token and user details to 'user' field
-    const handleLogin = async (event) => {
-        event.preventDefault();
-        console.log('Logging in for', username, password);
+    const login = async (creds) => {
+
         try{
-            const user = await loginService.login({
-                username, password,
-            })
+            const user = await loginService.login(creds);
 
             //save token to local storage
             window.localStorage.setItem(
@@ -101,7 +79,6 @@ const App = () => {
             );
             personService.setToken(user.token);
             setUser(user);
-            resetLogin();
         } catch (ex) {
             createError('Wrong credentials');
         }
@@ -141,25 +118,6 @@ const App = () => {
         });
     }
 
-    const refreshAll = () => {
-        refresh();
-        resetField();
-        resetLogin();
-    }
-
-    //fields must be reset to empty string before null or it will persist text
-    const resetField = () => {
-        setNewName('');
-        setNewName(null);
-        setNewNumber('');
-        setNewNumber(null);
-    }
-
-    const resetLogin = () => {
-        setUsername('');
-        setPassword('');
-    }
-
     const createNotif = (message) => {
         setNotif(message);
         setTimeout(() => {setNotif(null)}, 5000) // 2 seconds
@@ -176,8 +134,8 @@ const App = () => {
             <Notification message={notif}/>
             <Error message={error} />
             {user === null ? 
-                <LoginForm handlerLogin={handleLogin} username={username} password={password} setUsername={setUsername} setPassword={setPassword}/>
-                : <PersonForm user={user} handleSubmit={handleSubmit} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange}/>}
+                <LoginForm login={login} />
+                : <PersonForm user={user} publishPerson={publishPerson}/>}
             <h2>Numbers</h2>
             <People persons={persons} filter={newFilter} deleteHandler={handleDelete} />
             <Filter input={newFilter} inputHandler={handleFilterChange}/>
