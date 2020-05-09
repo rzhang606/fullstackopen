@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import FormField from './components/FormField'
 import People from './components/People'
 import Filter from './components/Filter'
 import Notification from './components/Notification'
 import Error from './components/Error'
+import LoginForm from './components/LoginForm'
+import PersonForm from './components/PersonForm'
 
 import personService from './services/Persons'
 import loginService from './services/Login'
@@ -121,6 +122,7 @@ const App = () => {
             })
     }, []) // empty array tells it to only run initially
 
+    //check for logged in user
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem('loggedPersonUser');
         if (loggedUserJSON) {
@@ -168,40 +170,17 @@ const App = () => {
         setTimeout(() => {setError(null)}, 5000);
     }
 
-    const loginForm = () => (
-        <form onSubmit={handleLogin}>
-            <div>
-                username <input type='text' value={username} name='Username' onChange={({ target }) => setUsername(target.value)} />
-            </div>
-            <div>
-                password <input type='text' value={password} name='Password' onChange={({ target }) => setPassword(target.value)} />
-            </div>
-            <button type='submit'>Login</button>
-        </form>
-    )
-
-    const noteForm = () => (
-        <div>
-            <h2>Add New as {user.name}:</h2>
-            <form onSubmit={handleSubmit}>
-                <FormField title="Name" input={newName} inputHandler={handleNameChange} />
-                <FormField title="Number" input={newNumber} inputHandler={handleNumberChange} />
-                <div>
-                <button type="submit">add</button>
-                </div>
-            </form>
-            <Filter input={newFilter} inputHandler={handleFilterChange}/>
-        </div>
-    )
-
     return (
         <div>
             <h2>Phonebook</h2>
             <Notification message={notif}/>
             <Error message={error} />
-            {user === null ? loginForm() : noteForm()}
+            {user === null ? 
+                <LoginForm handlerLogin={handleLogin} username={username} password={password} setUsername={setUsername} setPassword={setPassword}/>
+                : <PersonForm user={user} handleSubmit={handleSubmit} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange}/>}
             <h2>Numbers</h2>
             <People persons={persons} filter={newFilter} deleteHandler={handleDelete} />
+            <Filter input={newFilter} inputHandler={handleFilterChange}/>
         </div>
     )
 }
