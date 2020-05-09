@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import FormField from './FormField'
+import Togglable from './Togglable'
 
 const PersonForm = ({user, publishPerson}) => {
     const [ newName, setNewName ] = useState(''); // form input name
@@ -26,7 +27,7 @@ const PersonForm = ({user, publishPerson}) => {
     }
     
     return (
-        <div>
+        <Togglable buttonLabel='Create New Note'>
             <h2>Add New as {user.name}:</h2>
             <form onSubmit={createPerson}>
                 <FormField title="Name" input={newName} inputHandler={handleNameChange} />
@@ -35,7 +36,7 @@ const PersonForm = ({user, publishPerson}) => {
                 <button type="submit">add</button>
                 </div>
             </form>
-        </div>
+        </Togglable>
     )
 }
 
