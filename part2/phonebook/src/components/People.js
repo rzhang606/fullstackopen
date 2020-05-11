@@ -1,6 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
+import Filter from './Filter'
 
-const People = ({persons, filter, deleteHandler}) => {
+const People = ({persons, deleteHandler}) => {
+    const [ filter, setNewFilter ] = useState(''); // filter
+    const handleFilterChange = (event) => {
+        setNewFilter(event.target.value);
+    }
+
     let newPersons = persons;
     if(filter !== "") {
         newPersons = persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase())); 
@@ -13,6 +19,7 @@ const People = ({persons, filter, deleteHandler}) => {
                     <button onClick={() => deleteHandler(person.id)}>delete</button>
                 </p>
             )}
+            <Filter input={filter} inputHandler={handleFilterChange}/>
         </div>
     )
 }
