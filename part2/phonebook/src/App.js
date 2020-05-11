@@ -13,12 +13,11 @@ import {publishPerson, deletePerson} from './handlers/personHandler';
 import store from './reducers/store';
 import { fetchPStore } from './reducers/personReducer'
 import { createErrAction } from './reducers/errorReducer';
+import { createNotif } from './reducers/notifReducer';
 
 const App = () => {
 
     const [ user, setUser ] = useState(null);
-
-    const [ notif, setNotif ] = useState(null); // notification message
 
     /**
      * Callback Event Handlers to allow using the message components
@@ -29,7 +28,7 @@ const App = () => {
         
         if(code === 0) { //success
             store.dispatch(fetchPStore());
-            createNotif(message);
+            store.dispatch(createNotif(message));
         } else if (code === 1) {
             store.dispatch(createErrAction(message));
         } else {
@@ -43,7 +42,7 @@ const App = () => {
         
         if(code === 0) { //success
             store.dispatch(fetchPStore());
-            createNotif(message);
+            store.dispatch(createNotif(message));
         } else if (code === 1) {
             store.dispatch(createErrAction(message));
         } else {
@@ -65,6 +64,7 @@ const App = () => {
             );
             personService.setToken(user.token);
             setUser(user);
+            store.dispatch(createNotif(`Logged in as ${user.name}`));
         } catch (ex) {
             store.dispatch(createErrAction('Wrong Credentials'));
         }
@@ -87,23 +87,15 @@ const App = () => {
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON);
             setUser(user);
+            store.dispatch(createNotif(`Logged in as ${user.name}`));
             personService.setToken(user.token)
         }
     }, [])
 
-    /**
-     * Helpers
-     */
-
-    const createNotif = (message) => {
-        setNotif(message);
-        setTimeout(() => {setNotif(null)}, 5000) // 2 seconds
-    }
-
     return (
         <div>
             <h2>Phonebook</h2>
-            <Notification message={notif}/>
+            <Notification/>
             <Error/>
             {user === null ? 
                 <LoginForm login={login} />

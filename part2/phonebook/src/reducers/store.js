@@ -3,8 +3,13 @@ import thunk from 'redux-thunk';
 
 import personReducer from './personReducer';
 import errorReducer from './errorReducer';
+import notifReducer from './notifReducer';
 
-const reducers = combineReducers( {people: personReducer, error: errorReducer} );
+const reducers = combineReducers({
+    people: personReducer,
+    error: errorReducer,
+    notification: notifReducer
+});
 const personStore = createStore(
     reducers,
     applyMiddleware(thunk)

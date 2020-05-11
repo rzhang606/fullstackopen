@@ -1,7 +1,10 @@
-import React from 'react'
+import React from 'react';
+import store from '../reducers/store';
 
-const Notification = ({message}) => {
-    if(message === null) {
+
+const Notification = () => {
+    const message = store.getState().notification;
+    if(message === '') {
         return null;
     }
 

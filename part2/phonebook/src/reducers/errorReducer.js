@@ -2,7 +2,6 @@
  * Reducer
  */
 const errorReducer = (state = '', action) => {
-    console.log('Action:', action);
     switch(action.type) {
         case 'E_SET':
             return action.data;
