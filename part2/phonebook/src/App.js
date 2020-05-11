@@ -9,7 +9,9 @@ import PersonForm from './components/PersonForm'
 import personService from './services/Persons'
 import loginService from './services/Login'
 
-import personStore, { setPersons } from './reducers/personReducer';
+import {publishPerson, deletePerson} from './handlers/personHandler';
+
+import personStore, { setPStore } from './reducers/personReducer';
 
 const App = () => {
     const [ newFilter, setNewFilter ] = useState(''); // filter
@@ -20,50 +22,33 @@ const App = () => {
     const [ error, setError ] = useState(null); // error message
 
     /**
-     * Event Handlers
+     * Callback Event Handlers to allow using the message components
      */
 
-    const publishPerson = (nPerson) => {
-
-        const persons = personStore.getState();
+    const pubPerson = async (nPerson) => {
+        const {code, message} = await publishPerson(nPerson);
         
-        const duplicate = persons.filter(person => person.name === nPerson.name);
-        if(duplicate.length !== 0) { //if record exists
-            if(duplicate[0].number === nPerson.number) { //duplicate
-                window.alert(`${nPerson.name} is already added to phonebook.`);
-            } else { //update number
-                const confirmation = window.confirm(`Update ${nPerson.name}'s number with ${nPerson.number}?`);
-                if(confirmation) {
-                    console.log('Updating new number');
-                    personService.update(duplicate[0].id, nPerson).then( result => {
-                        createNotif(`${nPerson.name}'s number has been updated`);
-                        refresh();
-                    }).catch(err => {
-                        createError(`${nPerson.name} could not be updated: ${err.response.data}`)
-                    });
-                }
-            }
-        } else {    // add new record
-            personService.create(nPerson).then(result => {
-                refresh();
-                createNotif(`${nPerson.name} has been added`);
-            }).catch(err => {
-                console.log(err);
-                createError(`${nPerson.name} could not be added: ${err.response.data}`);
-            });
+        if(code === 0) { //success
+            fetchAll();
+            createNotif(message);
+        } else if (code === 1) {
+            createError(message);
+        } else {
+            createError('Something weird happened');
         }
+
     }
-
-    const handleDelete = (id) => {
-        const persons = personStore.getState();
-
-        const delName = (persons.find(element => element.id === id)).name;
-        const result = window.confirm(`Delete ${delName}'s record?`);
-        if(result) {
-            console.log('Delete: ', id, delName);
-            personService.remove(id).then(request => {
-                refresh();
-            });
+    
+    const handleDelete = async (id) => {
+        const {code, message} = await deletePerson(id);
+        
+        if(code === 0) { //success
+            fetchAll();
+            createNotif(message);
+        } else if (code === 1) {
+            createError(message);
+        } else {
+            createError('Something weird happened');
         }
     }
 
@@ -96,7 +81,7 @@ const App = () => {
     //initial fetching of persons
     useEffect(() => {
         console.log('Fetching data ... ');
-        refresh();
+        fetchAll();
     }, []) // empty array tells it to only run initially
 
     //check for logged in user
@@ -112,11 +97,11 @@ const App = () => {
     /**
      * Helpers
      */
-    const refresh = () => {
+    const fetchAll = () => {
         personService
             .getAll()
             .then(numbers => {
-                personStore.dispatch(setPersons(numbers));
+                personStore.dispatch(setPStore(numbers));
             });
     }
 
@@ -137,7 +122,7 @@ const App = () => {
             <Error message={error} />
             {user === null ? 
                 <LoginForm login={login} />
-                : <PersonForm user={user} publishPerson={publishPerson}/>}
+                : <PersonForm user={user} publishPerson={pubPerson}/>}
             <h2>Numbers</h2>
             <People persons={personStore.getState()} filter={newFilter} deleteHandler={handleDelete} />
             <Filter input={newFilter} inputHandler={handleFilterChange}/>

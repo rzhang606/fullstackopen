@@ -1,24 +1,9 @@
 import { createStore } from 'redux';
 
 /**
- * State
- */
-const persons = [];
-
-/**
- * Action Creators
- */
-export const setPersons = (people) => {
-    return {
-        type: 'SET',
-        data: people
-    }
-}
-
-/**
  * Reducer
  */
-const personsReducer = (state = persons, action) => {
+const personsReducer = (state = [], action) => {
     console.log('Action:', action);
     switch(action.type) {
         case 'SET':
@@ -28,5 +13,19 @@ const personsReducer = (state = persons, action) => {
     }
 }
 
+/**
+ * Action Creators
+ */
+export const setPStore = (people) => {
+    return {
+        type: 'SET',
+        data: people
+    }
+}
+
+/**
+ * Store
+ */
 const personStore = createStore(personsReducer);
+
 export default personStore;
