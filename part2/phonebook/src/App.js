@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import People from './components/People'
-import Filter from './components/Filter'
 import Notification from './components/Notification'
 import Error from './components/Error'
 import LoginForm from './components/LoginForm'
@@ -12,8 +11,6 @@ import loginService from './services/Login'
 import personStore, { setPersons } from './reducers/personReducer';
 
 const App = () => {
-    const [ newFilter, setNewFilter ] = useState(''); // filter
-
     const [ user, setUser ] = useState(null);
 
     const [ notif, setNotif ] = useState(null); // notification message
@@ -65,10 +62,6 @@ const App = () => {
                 refresh();
             });
         }
-    }
-
-    const handleFilterChange = (event) => {
-        setNewFilter(event.target.value);
     }
 
     //uses username and password to login, then saves the retrieved token and user details to 'user' field
@@ -139,8 +132,7 @@ const App = () => {
                 <LoginForm login={login} />
                 : <PersonForm user={user} publishPerson={publishPerson}/>}
             <h2>Numbers</h2>
-            <People persons={personStore.getState()} filter={newFilter} deleteHandler={handleDelete} />
-            <Filter input={newFilter} inputHandler={handleFilterChange}/>
+            <People persons={personStore.getState()} deleteHandler={handleDelete} />
         </div>
     )
 }
