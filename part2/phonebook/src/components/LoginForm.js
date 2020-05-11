@@ -16,7 +16,7 @@ const LoginForm = ({login}) => {
 
     const handleLogin = (event) => {
         event.preventDefault();
-        console.log('Logging in for', username, password);
+        console.log('Logging in for', username);
 
         login({
             username: username,
@@ -28,7 +28,7 @@ const LoginForm = ({login}) => {
     }
 
     return (
-        <Togglable buttonLabel='Login'>
+        <Togglable buttonLabel='Login here'>
             <form onSubmit={handleLogin}>
                 <FormField title={'Username'} input={username} inputHandler={handleUsernameChange}/>
                 <FormField title={'Password'} input={password} inputHandler={handlePasswordChange}/>
