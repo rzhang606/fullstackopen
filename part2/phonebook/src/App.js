@@ -10,7 +10,8 @@ import loginService from './services/Login'
 
 import {publishPerson, deletePerson} from './handlers/personHandler';
 
-import personStore, { setPStore } from './reducers/personReducer';
+import personStore from './reducers/store';
+import { fetchPStore } from './reducers/personReducer'
 
 const App = () => {
 
@@ -27,7 +28,7 @@ const App = () => {
         const {code, message} = await publishPerson(nPerson);
         
         if(code === 0) { //success
-            fetchAll();
+            personStore.dispatch(fetchPStore());
             createNotif(message);
         } else if (code === 1) {
             createError(message);
@@ -41,7 +42,7 @@ const App = () => {
         const {code, message} = await deletePerson(id);
         
         if(code === 0) { //success
-            fetchAll();
+            personStore.dispatch(fetchPStore());
             createNotif(message);
         } else if (code === 1) {
             createError(message);
@@ -77,7 +78,7 @@ const App = () => {
     //initial fetching of persons
     useEffect(() => {
         console.log('Fetching data ... ');
-        fetchAll();
+        personStore.dispatch(fetchPStore());
     }, []) // empty array tells it to only run initially
 
     //check for logged in user
@@ -93,13 +94,6 @@ const App = () => {
     /**
      * Helpers
      */
-    const fetchAll = () => {
-        personService
-            .getAll()
-            .then(numbers => {
-                personStore.dispatch(setPStore(numbers));
-            });
-    }
 
     const createNotif = (message) => {
         setNotif(message);
@@ -120,7 +114,7 @@ const App = () => {
                 <LoginForm login={login} />
                 : <PersonForm user={user} publishPerson={pubPerson}/>}
             <h2>Numbers</h2>
-            <People persons={personStore.getState()} deleteHandler={handleDelete} />
+            <People persons={personStore.getState().people} deleteHandler={handleDelete} />
         </div>
     )
 }

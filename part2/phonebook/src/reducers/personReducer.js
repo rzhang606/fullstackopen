@@ -1,4 +1,5 @@
-import { createStore } from 'redux';
+import personService from '../services/Persons';
+import { setErrAction } from './errorReducer';
 
 /**
  * Reducer
@@ -23,9 +24,12 @@ export const setPStore = (people) => {
     }
 }
 
-/**
- * Store
- */
-const personStore = createStore(personsReducer);
+export const fetchPStore = () => {
+    return (dispatch) => {
+        personService.getAll()
+            .then( response => dispatch(setPStore(response)))
+            .catch( err => dispatch(setErrAction(err)));
+    }
+}
 
-export default personStore;
+export default personsReducer;

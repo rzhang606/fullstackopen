@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Filter from './Filter'
 
-const People = ({persons, deleteHandler}) => {
+const People = ({persons = [], deleteHandler}) => {
     const [ filter, setNewFilter ] = useState(''); // filter
     const handleFilterChange = (event) => {
         setNewFilter(event.target.value);

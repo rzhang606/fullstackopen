@@ -1,13 +1,13 @@
 
 import personService from '../services/Persons';
-import personStore from '../reducers/personReducer'
+import personStore from '../reducers/store'
 
 /**
  * Event Handlers
  */
 export const publishPerson = async (nPerson) => {
-    const persons = personStore.getState();
-    const duplicate = persons.filter(person => person.name === nPerson.name);
+    const people = personStore.getState().people;
+    const duplicate = people.filter(person => person.name === nPerson.name);
     if(duplicate.length !== 0) { //if record exists
         if(duplicate[0].number === nPerson.number) { //duplicate
             return { code: 1, message: `${nPerson.name} is already added to phonebook.`};
@@ -36,9 +36,9 @@ export const publishPerson = async (nPerson) => {
 }
 
 export const deletePerson = async (id) => {
-    const persons = personStore.getState();
+    const people = personStore.getState().people;
 
-    const person = persons.find(element => element.id === id);
+    const person = people.find(element => element.id === id);
     if(!person) {
         return {code: 1, message: 'Does not exist'};
     }
