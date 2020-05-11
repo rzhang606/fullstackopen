@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
+import ratingStore from './reducers/ratingReducer';
 
 const Button = ({handleClick, text}) => (
   <button onClick={handleClick}>
@@ -13,17 +14,14 @@ const Statistics = ({text, value, endText}) => (
 
 
 const App = () => {
-  const [good, setGood] = useState(0)
-  const [neutral, setNeutral] = useState(0)
-  const [bad, setBad] = useState(0)
 
   const clickHandler = (value) => () => {
     if(value === 0) {
-      setGood(good + 1)
+      ratingStore.dispatch({type: 'GOOD'})
     } else if (value === 1) {
-      setNeutral(neutral + 1)
+      ratingStore.dispatch({type: 'OK'})
     } else if (value === 2) {
-      setBad(bad + 1)
+      ratingStore.dispatch({type: 'BAD'})
     }
   }
 
@@ -34,15 +32,19 @@ const App = () => {
       <Button handleClick={clickHandler(1)} text="Neutral"/>
       <Button handleClick={clickHandler(2)} text="Bad"/>
       <h1>Statistics</h1>
-      <Statistics text="Good" value={good}/>
-      <Statistics text="Neutral" value={neutral} />
-      <Statistics text="Bad" value={bad} />
-      <Statistics text="All" value={good + neutral + bad} />
-      <Statistics text="Average" value={(good - bad) / (good + neutral + bad)} />
-      <Statistics text="Positive" value={(good / (good + neutral + bad)) * 100} endText={'%'}/>
+      <Statistics text="Good" value={ratingStore.getState().good}/>
+      <Statistics text="Neutral" value={ratingStore.getState().ok} />
+      <Statistics text="Bad" value={ratingStore.getState().bad} />
+      <Statistics text="All" value={ratingStore.getState().all} />
+      <Statistics text="Average" value={(ratingStore.getState().good - ratingStore.getState().bad) / ratingStore.getState().all} />
+      <Statistics text="Positive" value={(ratingStore.getState().good / ratingStore.getState().all) * 100} endText={'%'}/>
     </div>
   )
 }
 
+const renderApp = () => {
+  ReactDOM.render( <App />, document.getElementById('root'));
+}
 
-ReactDOM.render( <App />, document.getElementById('root'));
+renderApp();
+ratingStore.subscribe(renderApp);
