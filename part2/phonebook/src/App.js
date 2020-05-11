@@ -9,8 +9,9 @@ import PersonForm from './components/PersonForm'
 import personService from './services/Persons'
 import loginService from './services/Login'
 
+import personStore, { setPersons } from './reducers/personReducer';
+
 const App = () => {
-    const [ persons, setPersons] = useState([]);
     const [ newFilter, setNewFilter ] = useState(''); // filter
 
     const [ user, setUser ] = useState(null);
@@ -23,6 +24,8 @@ const App = () => {
      */
 
     const publishPerson = (nPerson) => {
+
+        const persons = personStore.getState();
         
         const duplicate = persons.filter(person => person.name === nPerson.name);
         if(duplicate.length !== 0) { //if record exists
@@ -42,9 +45,8 @@ const App = () => {
             }
         } else {    // add new record
             personService.create(nPerson).then(result => {
-                setPersons(persons.concat(result));
-                createNotif(`${nPerson.name} has been added`);
                 refresh();
+                createNotif(`${nPerson.name} has been added`);
             }).catch(err => {
                 console.log(err);
                 createError(`${nPerson.name} could not be added: ${err.response.data}`);
@@ -53,6 +55,8 @@ const App = () => {
     }
 
     const handleDelete = (id) => {
+        const persons = personStore.getState();
+
         const delName = (persons.find(element => element.id === id)).name;
         const result = window.confirm(`Delete ${delName}'s record?`);
         if(result) {
@@ -92,11 +96,7 @@ const App = () => {
     //initial fetching of persons
     useEffect(() => {
         console.log('Fetching data ... ');
-        personService
-            .getAll()
-            .then(numbers => {
-                setPersons(numbers);
-            })
+        refresh();
     }, []) // empty array tells it to only run initially
 
     //check for logged in user
@@ -113,9 +113,11 @@ const App = () => {
      * Helpers
      */
     const refresh = () => {
-        personService.getAll().then(result => {
-            setPersons(result);
-        });
+        personService
+            .getAll()
+            .then(numbers => {
+                personStore.dispatch(setPersons(numbers));
+            });
     }
 
     const createNotif = (message) => {
@@ -137,7 +139,7 @@ const App = () => {
                 <LoginForm login={login} />
                 : <PersonForm user={user} publishPerson={publishPerson}/>}
             <h2>Numbers</h2>
-            <People persons={persons} filter={newFilter} deleteHandler={handleDelete} />
+            <People persons={personStore.getState()} filter={newFilter} deleteHandler={handleDelete} />
             <Filter input={newFilter} inputHandler={handleFilterChange}/>
         </div>
     )
