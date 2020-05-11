@@ -10,15 +10,15 @@ import loginService from './services/Login'
 
 import {publishPerson, deletePerson} from './handlers/personHandler';
 
-import personStore from './reducers/store';
+import store from './reducers/store';
 import { fetchPStore } from './reducers/personReducer'
+import { createErrAction } from './reducers/errorReducer';
 
 const App = () => {
 
     const [ user, setUser ] = useState(null);
 
     const [ notif, setNotif ] = useState(null); // notification message
-    const [ error, setError ] = useState(null); // error message
 
     /**
      * Callback Event Handlers to allow using the message components
@@ -28,12 +28,12 @@ const App = () => {
         const {code, message} = await publishPerson(nPerson);
         
         if(code === 0) { //success
-            personStore.dispatch(fetchPStore());
+            store.dispatch(fetchPStore());
             createNotif(message);
         } else if (code === 1) {
-            createError(message);
+            store.dispatch(createErrAction(message));
         } else {
-            createError('Something weird happened');
+            store.dispatch(createErrAction('Something weird happened'));
         }
 
     }
@@ -42,12 +42,12 @@ const App = () => {
         const {code, message} = await deletePerson(id);
         
         if(code === 0) { //success
-            personStore.dispatch(fetchPStore());
+            store.dispatch(fetchPStore());
             createNotif(message);
         } else if (code === 1) {
-            createError(message);
+            store.dispatch(createErrAction(message));
         } else {
-            createError('Something weird happened');
+            store.dispatch(createErrAction('Something weird happened'));;
         }
     }
 
@@ -66,7 +66,7 @@ const App = () => {
             personService.setToken(user.token);
             setUser(user);
         } catch (ex) {
-            createError('Wrong credentials');
+            store.dispatch(createErrAction('Wrong Credentials'));
         }
 
         
@@ -78,7 +78,7 @@ const App = () => {
     //initial fetching of persons
     useEffect(() => {
         console.log('Fetching data ... ');
-        personStore.dispatch(fetchPStore());
+        store.dispatch(fetchPStore());
     }, []) // empty array tells it to only run initially
 
     //check for logged in user
@@ -100,21 +100,16 @@ const App = () => {
         setTimeout(() => {setNotif(null)}, 5000) // 2 seconds
     }
 
-    const createError = (message) => {
-        setError(message);
-        setTimeout(() => {setError(null)}, 5000);
-    }
-
     return (
         <div>
             <h2>Phonebook</h2>
             <Notification message={notif}/>
-            <Error message={error} />
+            <Error/>
             {user === null ? 
                 <LoginForm login={login} />
                 : <PersonForm user={user} publishPerson={pubPerson}/>}
             <h2>Numbers</h2>
-            <People persons={personStore.getState().people} deleteHandler={handleDelete} />
+            <People persons={store.getState().people} deleteHandler={handleDelete} />
         </div>
     )
 }

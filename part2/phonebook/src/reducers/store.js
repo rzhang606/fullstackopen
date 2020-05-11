@@ -9,6 +9,6 @@ const personStore = createStore(
     reducers,
     applyMiddleware(thunk)
 );
-console.log(personStore.getState());
+console.log('State:', personStore.getState());
 
 export default personStore;

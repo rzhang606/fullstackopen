@@ -1,5 +1,5 @@
 import personService from '../services/Persons';
-import { setErrAction } from './errorReducer';
+import { createHTTPErrAction } from './errorReducer';
 
 /**
  * Reducer
@@ -7,7 +7,7 @@ import { setErrAction } from './errorReducer';
 const personsReducer = (state = [], action) => {
     console.log('Action:', action);
     switch(action.type) {
-        case 'SET':
+        case 'P_SET':
             return action.data;
         default:
             return state;
@@ -17,9 +17,9 @@ const personsReducer = (state = [], action) => {
 /**
  * Action Creators
  */
-export const setPStore = (people) => {
+const set_action = (people) => {
     return {
-        type: 'SET',
+        type: 'P_SET',
         data: people
     }
 }
@@ -27,8 +27,8 @@ export const setPStore = (people) => {
 export const fetchPStore = () => {
     return (dispatch) => {
         personService.getAll()
-            .then( response => dispatch(setPStore(response)))
-            .catch( err => dispatch(setErrAction(err)));
+            .then( response => dispatch(set_action(response)))
+            .catch( err => dispatch(createHTTPErrAction(err)));
     }
 }
 

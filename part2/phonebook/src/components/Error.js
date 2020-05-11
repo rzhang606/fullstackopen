@@ -1,13 +1,17 @@
 import React from 'react'
+import store from '../reducers/store';
 
 const Error = ({message}) => {
-    if(message === null) {
+    const errState = store.getState().error;
+
+    if(errState === '') {
         return null;
     }
+    
 
     return (
         <div className='error'>
-            {message}
+            {errState}
         </div>
     )
 }
