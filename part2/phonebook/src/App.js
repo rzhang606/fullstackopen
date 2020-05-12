@@ -35,7 +35,13 @@ const App = () => {
         }
 
         
-    } 
+    }
+    const logOut = () => {
+        window.localStorage.removeItem('loggedPersonUser');
+        personService.setToken(null);
+        setUser(null);
+        store.dispatch(createNotif('Logged Out'));
+    }
 
     /**
      * Effects
@@ -62,11 +68,18 @@ const App = () => {
             <h2>Phonebook</h2>
             <Notification/>
             <Error/>
-            {user === null ? 
-                <LoginForm login={login} />
-                : <PersonForm user={user}/>}
-            <h2>Numbers</h2>
-            <People persons={store.getState().people}/>
+            {user === null ?
+                <div>
+                    <LoginForm login={login} />
+                    <h2>Please log in to view numbers</h2>
+                </div>
+                :
+                <div>
+                    <PersonForm user={user}/>
+                    <button onClick={logOut}>Log Out</button>
+                    <h2>Numbers</h2>
+                    <People persons={store.getState().people}/>
+                </div>}
         </div>
     )
 }
