@@ -1,8 +1,9 @@
 import React, {useState} from 'react'
 import FormField from './FormField'
 import Togglable from './Togglable'
+import { publishPerson } from '../handlers/personHandler';
 
-const PersonForm = ({user, publishPerson}) => {
+const PersonForm = ({user}) => {
     const [ newName, setNewName ] = useState(''); // form input name
     const [ newNumber, setNewNumber ] = useState(''); // form input number
 
@@ -16,7 +17,7 @@ const PersonForm = ({user, publishPerson}) => {
 
     const createPerson = (event) => {
         event.preventDefault();
-        publishPerson({ //pass state to parent to handle actual submission
+        publishPerson({ 
             name: newName,
             number: newNumber
         });

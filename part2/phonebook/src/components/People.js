@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
-import Filter from './Filter'
+import React, { useState } from 'react';
+import Filter from './Filter';
+import { deletePerson } from '../handlers/personHandler';
 
-const People = ({persons = [], deleteHandler}) => {
+const People = ({persons = []}) => {
     const [ filter, setNewFilter ] = useState(''); // filter
     const handleFilterChange = (event) => {
         setNewFilter(event.target.value);
@@ -16,7 +17,7 @@ const People = ({persons = [], deleteHandler}) => {
             {newPersons.map((person) =>
                 <p key={person.name}>
                     {person.name} {person.number}
-                    <button onClick={() => deleteHandler(person.id)}>delete</button>
+                    <button onClick={() => deletePerson(person.id)}>delete</button>
                 </p>
             )}
             <Filter input={filter} inputHandler={handleFilterChange}/>
