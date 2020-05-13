@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {useHistory} from 'react-router-dom'
 import { useField } from '../hooks/index'
 
@@ -20,6 +20,13 @@ const CreateNew = (props) => {
       });
       history.push('/');
     }
+
+    const handleReset = (e) => {
+      e.preventDefault()
+      content.reset();
+      author.reset();
+      info.reset();
+    }
   
     return (
       <div>
@@ -38,6 +45,7 @@ const CreateNew = (props) => {
             <input {...info} />
           </div>
           <button>create</button>
+          <button onClick={handleReset}>reset</button>
         </form>
       </div>
     )
