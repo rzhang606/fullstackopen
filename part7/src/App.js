@@ -3,23 +3,10 @@ import About from './components/About'
 import AnecdoteList from './components/AnecdoteList'
 import Footer from './components/Footer'
 import CreateNew from './components/CreateNew'
+import Anecdote from './components/Anecdote'
 import {
-  BrowserRouter as Router,
-  Switch, Route, Link, Redirect
+  Switch, Route, Link, Redirect, useRouteMatch
 } from 'react-router-dom'
-
-const Menu = () => {
-  const padding = {
-    paddingRight: 5
-  }
-  return (
-    <div>
-      <a href='#' style={padding}>anecdotes</a>
-      <a href='#' style={padding}>create new</a>
-      <a href='#' style={padding}>about</a>
-    </div>
-  )
-}
 
 
 const App = () => {
@@ -61,8 +48,11 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
+  const match = useRouteMatch('/anecdotes/:id');
+  const anecdote = match ? anecdotes.find(element => Number(element.id) === Number(match.params.id)) : null;
+
   return (
-    <Router>
+    <div>
       <div>
         <Link style={{padding: 5}} to='/anecdotes'>Anecdotes</Link>
         <Link style={{padding: 5}} to='/create_new'>Create New</Link>
@@ -71,6 +61,9 @@ const App = () => {
       <h1>Software anecdotes</h1>
 
       <Switch>
+        <Route path='/anecdotes/:id'>
+          <Anecdote anecdote={anecdote} />
+        </Route>
         <Route path='/anecdotes'>
           <AnecdoteList anecdotes={anecdotes} />
         </Route>
@@ -86,7 +79,7 @@ const App = () => {
       </Switch>
 
       <Footer />
-    </Router>
+    </div>
   )
 }
 
