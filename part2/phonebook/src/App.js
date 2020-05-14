@@ -13,6 +13,8 @@ import { fetchPStore } from './reducers/personReducer'
 import { createErrAction } from './reducers/errorReducer';
 import { createNotif } from './reducers/notifReducer';
 
+import { Button } from 'react-bootstrap'
+
 const App = () => {
 
     const [ user, setUser ] = useState(null);
@@ -76,7 +78,7 @@ const App = () => {
                 :
                 <div>
                     <PersonForm user={user}/>
-                    <button onClick={logOut}>Log Out</button>
+                    <Button onClick={logOut}>Log Out</Button>
                     <h2>Numbers</h2>
                     <People persons={store.getState().people}/>
                 </div>}

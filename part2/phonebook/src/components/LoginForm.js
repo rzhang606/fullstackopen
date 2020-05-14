@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import FormField from './FormField'
 import Togglable from './Togglable'
+import { Form, Button } from 'react-bootstrap'
 
 const LoginForm = ({login}) => {
     const [ username, setUsername ] = useState(''); // form input username
@@ -29,11 +30,11 @@ const LoginForm = ({login}) => {
 
     return (
         <Togglable buttonLabel='Login here'>
-            <form onSubmit={handleLogin}>
+            <Form onSubmit={handleLogin}>
                 <FormField title={'Username'} input={username} inputHandler={handleUsernameChange}/>
                 <FormField title={'Password'} input={password} inputHandler={handlePasswordChange}/>
-                <button type='submit'>Login</button>
-            </form>
+                <Button type='submit'>Login</Button>
+            </Form>
         </Togglable>
     )
 }

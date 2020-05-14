@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import FormField from './FormField'
 import Togglable from './Togglable'
 import { publishPerson } from '../handlers/personHandler';
+import { Form, Button } from 'react-bootstrap'
 
 const PersonForm = ({user}) => {
     const [ newName, setNewName ] = useState(''); // form input name
@@ -30,13 +31,11 @@ const PersonForm = ({user}) => {
     return (
         <Togglable buttonLabel='Create New Note'>
             <h2>Add New as {user.name}:</h2>
-            <form onSubmit={createPerson}>
+            <Form onSubmit={createPerson}>
                 <FormField title="Name" input={newName} inputHandler={handleNameChange} />
-                <FormField title="Number" input={newNumber} inputHandler={handleNumberChange} />
-                <div>
-                <button type="submit">add</button>
-                </div>
-            </form>
+                <FormField title="Number" input={newNumber} inputHandler={handleNumberChange} />          
+                <Button type="submit">add</Button>
+            </Form>
         </Togglable>
     )
 }
